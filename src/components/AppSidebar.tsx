@@ -26,17 +26,26 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-const items = [
+const mainItems = [
   { title: "Dashboard", url: "/", icon: BarChart3 },
+]
+
+const communicationItems = [
   { title: "Comunicación", url: "/comunicacion", icon: MessageSquare },
   { title: "Contactos", url: "/contactos", icon: Users },
   { title: "Campañas", url: "/campanas", icon: Megaphone },
-  { title: "Automatizaciones", url: "/automatizaciones", icon: Bot },
-  { title: "Inventario", url: "/inventario", icon: Package },
+  { title: "Telegram", url: "/telegram", icon: MessageSquare },
+]
+
+const ecommerceItems = [
   { title: "Clientes", url: "/clientes", icon: Users2 },
   { title: "Órdenes", url: "/ordenes", icon: ShoppingCart },
+  { title: "Inventario", url: "/inventario", icon: Package },
+]
+
+const systemItems = [
+  { title: "Automatizaciones", url: "/automatizaciones", icon: Bot },
   { title: "Integraciones", url: "/integraciones", icon: Puzzle },
-  { title: "Telegram", url: "/telegram", icon: MessageSquare },
 ]
 
 export function AppSidebar() {
@@ -45,13 +54,36 @@ export function AppSidebar() {
   const currentPath = location.pathname
   const collapsed = state === "collapsed"
 
+  const allItems = [...mainItems, ...communicationItems, ...ecommerceItems, ...systemItems]
   const isActive = (path: string) => currentPath === path
-  const isExpanded = items.some((i) => isActive(i.url))
 
   const getNavCls = ({ isActive }: { isActive: boolean }) =>
     isActive 
       ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium shadow-card border-l-2 border-sidebar-primary" 
       : "hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground transition-all duration-200"
+
+  const renderMenuItems = (items: typeof mainItems) => (
+    <SidebarMenu className="space-y-1">
+      {items.map((item) => (
+        <SidebarMenuItem key={item.title}>
+          <SidebarMenuButton asChild>
+            <NavLink 
+              to={item.url} 
+              end 
+              className={({ isActive }) => `
+                ${getNavCls({ isActive })}
+                flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm
+                ${collapsed ? 'justify-center' : ''}
+              `}
+            >
+              <item.icon className="h-4 w-4 flex-shrink-0" />
+              {!collapsed && <span>{item.title}</span>}
+            </NavLink>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  )
 
   return (
     <Sidebar
@@ -73,32 +105,51 @@ export function AppSidebar() {
           </div>
         </div>
 
-        <SidebarGroup
-          className="flex-1"
-        >
-          <SidebarGroupContent>
-            <SidebarMenu className="space-y-1 p-2">
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end 
-                      className={({ isActive }) => `
-                        ${getNavCls({ isActive })}
-                        flex items-center gap-3 px-3 py-3 rounded-lg text-sm
-                        ${collapsed ? 'justify-center' : ''}
-                      `}
-                    >
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {/* Main Navigation */}
+        <div className="flex-1 py-2">
+          {/* Dashboard */}
+          <SidebarGroup className="px-2">
+            <SidebarGroupContent>
+              {renderMenuItems(mainItems)}
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          {/* Communication */}
+          <SidebarGroup className="px-2">
+            {!collapsed && (
+              <SidebarGroupLabel className="px-2 text-xs font-medium text-sidebar-foreground/70 mb-2">
+                Comunicación
+              </SidebarGroupLabel>
+            )}
+            <SidebarGroupContent>
+              {renderMenuItems(communicationItems)}
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          {/* E-commerce */}
+          <SidebarGroup className="px-2">
+            {!collapsed && (
+              <SidebarGroupLabel className="px-2 text-xs font-medium text-sidebar-foreground/70 mb-2">
+                E-commerce
+              </SidebarGroupLabel>
+            )}
+            <SidebarGroupContent>
+              {renderMenuItems(ecommerceItems)}
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          {/* System */}
+          <SidebarGroup className="px-2">
+            {!collapsed && (
+              <SidebarGroupLabel className="px-2 text-xs font-medium text-sidebar-foreground/70 mb-2">
+                Sistema
+              </SidebarGroupLabel>
+            )}
+            <SidebarGroupContent>
+              {renderMenuItems(systemItems)}
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </div>
 
         {/* User Section */}
         <div className="p-4 border-t border-sidebar-border">
